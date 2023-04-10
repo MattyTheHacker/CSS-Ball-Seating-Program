@@ -20,12 +20,7 @@ public class Person {
         // print the person's name, their preferences, and their seat
         // if a preference is not set, print None
         // if a seat is not set, print None
-        return String.format("%s(%s): %s, %s, %s",
-                name,
-                active ? "Active" : "Inactive",
-                preference1 == null ? "No Preference 1" : preference1.getName(),
-                preference2 == null ? "No Preference 2" : preference2.getName(),
-                seat == null ? "No Seat" : seat);
+        return String.format("%s(%s): %s, %s, %s", name, active ? "Active" : "Inactive", preference1 == null ? "No Preference 1" : preference1.getName(), preference2 == null ? "No Preference 2" : preference2.getName(), seat == null ? "No Seat" : seat);
     }
 
     public String getName() {
