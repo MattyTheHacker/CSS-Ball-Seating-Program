@@ -2,7 +2,8 @@ import java.util.ArrayList;
 
 public class Table {
     private static final int MAX_SEATS = 10;
-    private static final ArrayList<Person> SEATS = new ArrayList<>(MAX_SEATS);
+
+    private final ArrayList<Person> SEATS = new ArrayList<>(MAX_SEATS);
 
     private final String letter;
     private final String name;
@@ -10,6 +11,24 @@ public class Table {
     public Table(String name) {
         this.name = name;
         this.letter = name.substring(0, 1);
+
+        for (int i = 0; i < MAX_SEATS; i++) {
+            SEATS.add(null);
+        }
+    }
+
+    public String toString() {
+        return String.format("Table %s: %s", name, SEATS);
+    }
+
+    public void printSeats() {
+        for (int i = 0; i < MAX_SEATS; i++) {
+            if (SEATS.get(i) == null) {
+                System.out.printf("%s%d: Empty%n", letter, i);
+            } else {
+                System.out.printf("%s%d: %s%n", letter, i, SEATS.get(i).getName());
+            }
+        }
     }
 
     public String getLetter() {
@@ -47,10 +66,10 @@ public class Table {
     }
 
     public int getNumberOfEmptySeats() {
-        int emptySeats = 0;
+        int emptySeats = MAX_SEATS;
         for (Person seat : SEATS) {
-            if (seat == null) {
-                emptySeats++;
+            if (seat != null) {
+                emptySeats--;
             }
         }
         return emptySeats;
@@ -58,5 +77,28 @@ public class Table {
 
     public boolean isFull() {
         return getNumberOfEmptySeats() == 0;
+    }
+
+    public void addGroup(Group group) {
+        // add the group to the table
+        // if the table is full, throw an exception
+        for (Person person : group.getMembers()) {
+            // if the person is already at a table, throw an exception
+            if (person.getSeat() != null) {
+                throw new IllegalArgumentException("[ERROR] Person " + person.getName() + " is already at a table!");
+            }
+            // if the table is full, throw an exception
+            if (isFull()) {
+                throw new IllegalArgumentException("[ERROR] Table " + name + " is full!");
+            }
+            // add the person to the table
+            for (int i = 0; i < MAX_SEATS; i++) {
+                if (isSeatEmpty(i)) {
+                    setSeat(i, person);
+                    person.setSeat(letter + i);
+                    break;
+                }
+            }
+        }
     }
 }

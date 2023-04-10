@@ -83,6 +83,37 @@ public class SeatingPlanHandler {
         }
     }
 
+    private static void findATable(Group group) {
+        for (Table t : TABLES) {
+            int emptySeats = t.getNumberOfEmptySeats();
+            int groupSize = group.getMembers().size();
+            if (emptySeats >= groupSize) {
+                // group fits on table, add them
+                t.addGroup(group);
+                return;
+            }
+        }
+
+        // split the group
+        Group g1 = new Group(group.getName() + " 1");
+        Group g2 = new Group(group.getName() + " 2");
+
+        // add the first half of the group to g1
+        for (int i = 0; i < group.getMembers().size() / 2; i++) {
+            g1.addMember(group.getMembers().get(i));
+        }
+
+        // add the second half of the group to g2
+        for (int i = group.getMembers().size() / 2; i < group.getMembers().size(); i++) {
+            g2.addMember(group.getMembers().get(i));
+        }
+
+        // try to add the groups to the table
+        findATable(g1);
+        findATable(g2);
+
+    }
+
     public static void generateSeatingPlan() {
         // we need to generate a seating plan, putting people together based on preferences
         // first split the people into groups based on their preferences
@@ -107,9 +138,37 @@ public class SeatingPlanHandler {
             }
         }
 
+        // now we have a list of groups, we need to put them into tables
+        // we need to put the largest groups into tables first, so sort the groups by size
+        GROUPS.sort((g1, g2) -> g2.getMembers().size() - g1.getMembers().size());
+
         System.out.println("Groups:");
         for (Group group : GROUPS) {
             System.out.println(group);
+        }
+
+        // use the table names enum and iterate up to the max number of tables
+        for (int i = 0; i < MAX_TABLES; i++) {
+            // create a new table
+            Table table = new Table(TableNames.values()[i].toString());
+            // add the table to the list of tables
+            TABLES.add(table);
+        }
+
+        // iterate over the groups, check if they fit on a table, if not, split
+        // first loop over all tables to see if they have space for the group
+        // if they don't, split the group and try again
+        for (Group g : GROUPS) {
+            // try to find a table for a group
+            findATable(g);
+        }
+
+        // print the seating plan
+        System.out.println("Seating Plan:");
+        for (Table t : TABLES) {
+            System.out.println(t.getName() + ": ");
+            t.printSeats();
+            System.out.println("==================================");
         }
     }
 }

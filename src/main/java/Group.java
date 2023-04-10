@@ -32,4 +32,8 @@ public class Group {
     public String toString() {
         return String.format("Group %s: %s", name, MEMBERS);
     }
+
+    public String getName() {
+        return name;
+    }
 }
