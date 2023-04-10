@@ -2,6 +2,6 @@ public class SeatingPlan {
     public static void main(String[] args) {
         FileHandler.getData();
 
-        SeatingPlanHandler.printPeople();
+        SeatingPlanHandler.generateSeatingPlan();
     }
 }
