@@ -22,7 +22,10 @@ public class SeatingPlanHandler {
     }
 
     public static void addPerson(Person person) {
-        PEOPLE.add(person);
+        // if the person isn't already in the list, add them
+        if (!PEOPLE.contains(person)) {
+            PEOPLE.add(person);
+        }
     }
 
     public static Person getPerson(String name) {

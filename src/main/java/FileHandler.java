@@ -43,8 +43,9 @@ public class FileHandler {
                         attendee.setActive(true);
                     } else {
                         // the attendee does not exist, create them
-                        Person attendee = new Person(data[0], true);
+                        Person attendee = new Person(data[0]);
                         SeatingPlanHandler.addPerson(attendee);
+                        attendee.setActive(true);
                     }
 
                     Person attendee = SeatingPlanHandler.getPerson(data[0]);
@@ -55,10 +56,12 @@ public class FileHandler {
                             // the person exists, set the preference
                             Person preference1 = SeatingPlanHandler.getPerson(data[1]);
                             attendee.setPreference1(preference1);
+                            SeatingPlanHandler.addPerson(preference1);
                         } else {
                             // the person does not exist, create them
-                            Person preference1 = new Person(data[1], false);
+                            Person preference1 = new Person(data[1]);
                             attendee.setPreference1(preference1);
+                            SeatingPlanHandler.addPerson(preference1);
                         }
                     }
 
@@ -68,10 +71,12 @@ public class FileHandler {
                             // the person exists, set the preference
                             Person preference2 = SeatingPlanHandler.getPerson(data[2]);
                             attendee.setPreference2(preference2);
+                            SeatingPlanHandler.addPerson(preference2);
                         } else {
                             // the person does not exist, create them
-                            Person preference2 = new Person(data[2], false);
+                            Person preference2 = new Person(data[2]);
                             attendee.setPreference2(preference2);
+                            SeatingPlanHandler.addPerson(preference2);
                         }
                     }
                 }

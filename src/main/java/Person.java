@@ -8,12 +8,12 @@ public class Person {
 
     private boolean active;
 
-    public Person(String name, boolean active) {
+    public Person(String name) {
         this.name = name;
         this.preference1 = null;
         this.preference2 = null;
         this.seat = null;
-        this.active = active;
+        this.active = false;
     }
 
     public String toString() {
