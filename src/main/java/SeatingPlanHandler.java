@@ -5,7 +5,7 @@ public class SeatingPlanHandler {
     private static final ArrayList<Person> PEOPLE = new ArrayList<>();
     private static final ArrayList<Group> GROUPS = new ArrayList<>();
 
-    private static final int MAX_TABLES = 10;
+    private static final int MAX_TABLES = 20;
     private static final int MAX_PEOPLE = 200;
 
     public static void printPeople() {
