@@ -107,7 +107,6 @@ public class SeatingPlanHandler {
 
         // print groups
         System.out.println("Groups:");
-        GroupHandler.printGroups();
 
         // iterate over the groups, check if they fit on a table, if not, split
         // first loop over all tables to see if they have space for the group
