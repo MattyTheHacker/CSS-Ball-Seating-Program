@@ -17,8 +17,8 @@ public class Group {
         MEMBERS.remove(person);
     }
 
-    public boolean isEmpty() {
-        return MEMBERS.isEmpty();
+    public void removeDuplicates() {
+        MEMBERS.removeIf(person -> MEMBERS.indexOf(person) != MEMBERS.lastIndexOf(person));
     }
 
     public ArrayList<Person> getMembers() {
@@ -35,5 +35,9 @@ public class Group {
 
     public String getName() {
         return name;
+    }
+
+    public int getNumberOfMembers() {
+        return MEMBERS.size();
     }
 }

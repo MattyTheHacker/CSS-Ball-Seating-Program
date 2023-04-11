@@ -3,5 +3,8 @@ public class SeatingPlan {
         FileHandler.getData();
 
         SeatingPlanHandler.generateSeatingPlan();
+
+//        SeatingPlanHandler.generateSeatingPlan();
+
     }
 }
