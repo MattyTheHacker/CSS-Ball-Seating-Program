@@ -123,4 +123,47 @@ public class GroupHandler {
             group.printRelationships();
         }
     }
+
+    private static ArrayList<Person> recursivelyGetAllPreferences(Person person, ArrayList<Person> preferences) {
+        // recursively add all preferences to the arraylist
+        if (person.getPreference1() != null && !preferences.contains(person.getPreference1())) {
+            preferences.add(person.getPreference1());
+            recursivelyGetAllPreferences(person.getPreference1(), preferences);
+        }
+        if (person.getPreference2() != null && !preferences.contains(person.getPreference1())) {
+            preferences.add(person.getPreference2());
+            recursivelyGetAllPreferences(person.getPreference2(), preferences);
+        }
+        return preferences;
+    }
+
+    public static boolean checkGroupSplit(Person p1, Person p2) {
+        // if we break the relationship between these two people, do we get two distinct groups?
+        // if yes return true, else false
+        // recursively add p1's relationships to g1
+        ArrayList<Person> p1Preferences = recursivelyGetAllPreferences(p1, new ArrayList<>());
+        ArrayList<Person> p2Preferences = recursivelyGetAllPreferences(p2, new ArrayList<>());
+
+        // check for any overlap between the two arraylists
+        for (Person p : p1Preferences) {
+            if (p2Preferences.contains(p)) {
+                return false;
+            }
+        }
+
+        return p1Preferences.size() >= 3 || p2Preferences.size() >= 3;
+    }
+
+    public static ArrayList<Person> recursivelyGetAllPreferencesExcept(Person person, ArrayList<Person> preferences, Person except) {
+        // recursively add all preferences to the arraylist
+        if (person.getPreference1() != null && !preferences.contains(person.getPreference1()) && person.getPreference1() != except) {
+            preferences.add(person.getPreference1());
+            recursivelyGetAllPreferencesExcept(person.getPreference1(), preferences, except);
+        }
+        if (person.getPreference2() != null && !preferences.contains(person.getPreference1()) && person.getPreference2() != except) {
+            preferences.add(person.getPreference2());
+            recursivelyGetAllPreferencesExcept(person.getPreference2(), preferences, except);
+        }
+        return preferences;
+    }
 }

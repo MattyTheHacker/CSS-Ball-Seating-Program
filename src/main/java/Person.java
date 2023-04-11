@@ -41,6 +41,17 @@ public class Person {
         return preferences;
     }
 
+    public ArrayList<Person> getPreferencesExcept(Person badPerson) {
+        ArrayList<Person> preferences = new ArrayList<>();
+        if (preference1 != null && !preference1.equals(badPerson)) {
+            preferences.add(preference1);
+        }
+        if (preference2 != null && !preference2.equals(badPerson)) {
+            preferences.add(preference2);
+        }
+        return preferences;
+    }
+
     public String getName() {
         return name;
     }

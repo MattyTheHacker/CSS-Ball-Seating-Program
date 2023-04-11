@@ -24,6 +24,13 @@ public class Group {
         MEMBERS.addAll(set);
     }
 
+    public int[][] getRelationships() {
+        if (RELATIONSHIPS == null) {
+            generateRelationships();
+        }
+        return RELATIONSHIPS;
+    }
+
     public void printRelationships() {
         // print relationships in the form of a table
         // first row and column are the names of the people
@@ -67,14 +74,14 @@ public class Group {
             RELATIONSHIPS[i][i] = -1;
         }
 
-        // for each person in the group, if they have selected someone as a preference, increment relationship by 1
+        // for each person in the group, if they have selected someone as a preference, increment relationship by 10
         for (Person person : MEMBERS) {
             ArrayList<Person> preferences = person.getPreferences();
             if (preferences.size() > 0) {
                 for (Person preference : preferences) {
                     if (MEMBERS.contains(preference)) {
                         // increment the relationship
-                        RELATIONSHIPS[MEMBERS.indexOf(person)][MEMBERS.indexOf(preference)]++;
+                        RELATIONSHIPS[MEMBERS.indexOf(person)][MEMBERS.indexOf(preference)] += 10;
                     }
 
                     // if two people have put each other as preferences, set to 77
@@ -94,6 +101,7 @@ public class Group {
             for (Person person : cluster) {
                 tmp.addAll(person.getPreferences());
             }
+
             for (Person person : cluster) {
                 tmp.addAll(person.getPreferences());
             }
@@ -104,12 +112,22 @@ public class Group {
             // empty and delete tmp
             tmp.clear();
 
+            int increment = 0;
+            for (Person person : cluster) {
+                if (person.equals(target)) {
+                    increment++;
+                }
+            }
+
             // increment the relationship between the target and every person in the cluster by 1
             for (Person person : cluster) {
                 if (MEMBERS.contains(person)) {
                     // do not increment relationships with self
                     if (!person.equals(target)) {
-                        RELATIONSHIPS[MEMBERS.indexOf(target)][MEMBERS.indexOf(person)]++;
+                        if (RELATIONSHIPS[MEMBERS.indexOf(target)][MEMBERS.indexOf(person)] != 0){
+                            RELATIONSHIPS[MEMBERS.indexOf(target)][MEMBERS.indexOf(person)]++;
+                            RELATIONSHIPS[MEMBERS.indexOf(person)][MEMBERS.indexOf(target)] += increment;
+                        }
                     }
                 }
             }

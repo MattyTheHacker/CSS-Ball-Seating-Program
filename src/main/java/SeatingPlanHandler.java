@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class SeatingPlanHandler {
     private static final ArrayList<Table> TABLES = new ArrayList<>();
@@ -52,21 +54,24 @@ public class SeatingPlanHandler {
     }
 
     private static void findATable(Group group) {
-        // we want to prioritise filling empty tables first
-        for (Table t : TABLES) {
-            if (t.getNumberOfEmptySeats() == 10 && group.getMembers().size() <= 10) {
-                t.addGroup(group);
-                return;
+        // check if the group actually fits on any table (<10)
+        if (group.getNumberOfMembers() <= 10) {
+            // we want to prioritise filling empty tables first
+            for (Table t : TABLES) {
+                if (t.getNumberOfEmptySeats() == 10) {
+                    t.addGroup(group);
+                    return;
+                }
             }
-        }
 
-        for (Table t : TABLES) {
-            int groupSize = group.getMembers().size();
-            int emptySeats = t.getNumberOfEmptySeats();
-            if (emptySeats >= groupSize) {
-                // group fits on table, add them
-                t.addGroup(group);
-                return;
+            for (Table t : TABLES) {
+                int groupSize = group.getMembers().size();
+                int emptySeats = t.getNumberOfEmptySeats();
+                if (emptySeats >= groupSize) {
+                    // group fits on table, add them
+                    t.addGroup(group);
+                    return;
+                }
             }
         }
 
@@ -78,15 +83,76 @@ public class SeatingPlanHandler {
         GroupHandler.addSplitGroup(g1);
         GroupHandler.addSplitGroup(g2);
 
-        // add the first half of the group to g1
-        for (int i = 0; i < group.getMembers().size() / 2; i++) {
-            g1.addMember(group.getMembers().get(i));
+        int[][] relationships = group.getRelationships();
+        int weakestRelationship = 100;
+        boolean splitSuccess = false;
+
+        // iterate over the relationships
+        // find the weakest relationship
+        // if one person has two relationships that are lowest, then split the group on that person
+        // allocate that person to the smallest group first
+        for (int i = 0; i < relationships.length; i++) {
+            for (int j = 0; j < relationships[i].length; j++) {
+                if (relationships[i][j] > 0 && relationships[j][i] > 0) {
+                    int weight = relationships[i][j] + relationships[j][i];
+                    if (weight < weakestRelationship && weight > 0) {
+                        weakestRelationship = weight;
+                    }
+                }
+            }
         }
 
-        // add the second half of the group to g2
-        for (int i = group.getMembers().size() / 2; i < group.getMembers().size(); i++) {
-            g2.addMember(group.getMembers().get(i));
+        weakestRelationship = weakestRelationship * 2;
+
+        for (int i = 0; i < relationships.length; i++) {
+            for (int j = 0; j < relationships[i].length; j++) {
+                if (relationships[i][j] >= 0 && relationships[j][i] >= 0 && !splitSuccess) {
+                    int weight = relationships[i][j] + relationships[j][i];
+                    if (weight <= weakestRelationship) {
+                        Person p1 = group.getMembers().get(i);
+                        Person p2 = group.getMembers().get(j);
+
+                        if (GroupHandler.checkGroupSplit(p1, p2)) {
+                            g1.addMember(p1);
+                            g2.addMember(p2);
+
+                            ArrayList<Person> p1Preferences = GroupHandler.recursivelyGetAllPreferencesExcept(p1, new ArrayList<>(), p2);
+                            ArrayList<Person> p2Preferences = GroupHandler.recursivelyGetAllPreferencesExcept(p2, new ArrayList<>(), p1);
+
+                            Set<Person> p1Set = new HashSet<>(p1Preferences);
+                            Set<Person> p2Set = new HashSet<>(p2Preferences);
+
+                            for (Person p : p1Set) {
+                                if (!g1.getMembers().contains(p)) {
+                                    g1.addMember(p);
+                                }
+                            }
+
+                            for (Person p : p2Set) {
+                                if (!g2.getMembers().contains(p)) {
+                                    g2.addMember(p);
+                                }
+                            }
+
+                            group.empty();
+
+                            splitSuccess = true;
+
+                            break;
+                        } else {
+                            System.out.println("[DEBUG] Attempted to split Group " + group.getName() + " on " + p1.getName() + " and " + p2.getName() + " but failed!");
+                        }
+                    }
+                }
+            }
         }
+
+        if (!splitSuccess) {
+            System.out.println("[ERROR] Could not split group " + group.getName() + "!");
+            System.out.println("Weakest relationship: " + weakestRelationship);
+            System.exit(1);
+        }
+
 
         // empty the old group
         group.empty();
@@ -117,24 +183,23 @@ public class SeatingPlanHandler {
             addTable(table);
         }
 
-        // sort the groups by size
-        GroupHandler.sortGroupsBySize();
-
         // remove duplicate members from groups
         GroupHandler.removeAllDuplicates();
 
+        // sort the groups by size
+        GroupHandler.sortGroupsBySize();
+
         // sort groups alphabetically
         GroupHandler.sortAllGroupsAlphabetically();
-
-        // generate relationships within groups
-        GroupHandler.generateAllRelationships();
 
         // print groups
         System.out.println("Groups:");
         GroupHandler.printGroups();
 
+        // generate relationships within groups
+        GroupHandler.generateAllRelationships();
+
         // print the relationships within the biggest group
-        System.out.println("Relationships:");
         GroupHandler.printAllRelationships();
 
         // iterate over the groups, check if they fit on a table, if not, split
