@@ -52,9 +52,17 @@ public class SeatingPlanHandler {
     }
 
     private static void findATable(Group group) {
+        // we want to prioritise filling empty tables first
         for (Table t : TABLES) {
-            int emptySeats = t.getNumberOfEmptySeats();
+            if (t.getNumberOfEmptySeats() == 10 && group.getMembers().size() <= 10) {
+                t.addGroup(group);
+                return;
+            }
+        }
+
+        for (Table t : TABLES) {
             int groupSize = group.getMembers().size();
+            int emptySeats = t.getNumberOfEmptySeats();
             if (emptySeats >= groupSize) {
                 // group fits on table, add them
                 t.addGroup(group);
