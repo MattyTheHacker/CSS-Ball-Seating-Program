@@ -130,7 +130,7 @@ public class GroupHandler {
             preferences.add(person.getPreference1());
             recursivelyGetAllPreferences(person.getPreference1(), preferences);
         }
-        if (person.getPreference2() != null && !preferences.contains(person.getPreference1())) {
+        if (person.getPreference2() != null && !preferences.contains(person.getPreference2())) {
             preferences.add(person.getPreference2());
             recursivelyGetAllPreferences(person.getPreference2(), preferences);
         }
@@ -156,11 +156,17 @@ public class GroupHandler {
 
     public static ArrayList<Person> recursivelyGetAllPreferencesExcept(Person person, ArrayList<Person> preferences, Person except) {
         // recursively add all preferences to the arraylist
-        if (person.getPreference1() != null && !preferences.contains(person.getPreference1()) && person.getPreference1() != except) {
+
+        Person preference1 = person.getPreference1();
+        Person preference2 = person.getPreference2();
+
+
+        preferences.add(person);
+        if (preference1 != null && !preferences.contains(preference1) && preference1 != except) {
             preferences.add(person.getPreference1());
             recursivelyGetAllPreferencesExcept(person.getPreference1(), preferences, except);
         }
-        if (person.getPreference2() != null && !preferences.contains(person.getPreference1()) && person.getPreference2() != except) {
+        if (preference2 != null && !preferences.contains(preference2) && preference2 != except) {
             preferences.add(person.getPreference2());
             recursivelyGetAllPreferencesExcept(person.getPreference2(), preferences, except);
         }
