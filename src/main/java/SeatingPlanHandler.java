@@ -113,6 +113,7 @@ public class SeatingPlanHandler {
         // sort the groups by size
         GroupHandler.sortGroupsBySize();
 
+        // remove duplicate members from groups
         GroupHandler.removeAllDuplicates();
 
         // sort groups alphabetically
