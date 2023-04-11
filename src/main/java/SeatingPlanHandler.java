@@ -119,9 +119,16 @@ public class SeatingPlanHandler {
         // sort groups alphabetically
         GroupHandler.sortAllGroupsAlphabetically();
 
+        // generate relationships within groups
+        GroupHandler.generateAllRelationships();
+
         // print groups
-        System.out.println("Groups:");
-        GroupHandler.printGroups();
+//        System.out.println("Groups:");
+//        GroupHandler.printGroups();
+
+        // print the relationships within the biggest group
+        System.out.println("Relationships:");
+        GroupHandler.getGroups().get(0).printRelationships();
 
         // iterate over the groups, check if they fit on a table, if not, split
         // first loop over all tables to see if they have space for the group
@@ -132,6 +139,6 @@ public class SeatingPlanHandler {
         }
 
         // print the seating plan
-        printSeatingPlan();
+//        printSeatingPlan();
     }
 }

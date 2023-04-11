@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Person {
     private final String name;
 
@@ -26,6 +28,17 @@ public class Person {
                 preference1 == null ? "No Preference 1" : preference1.getName(),
                 preference2 == null ? "No Preference 2" : preference2.getName(),
                 seat == null ? "No Seat" : seat);
+    }
+
+    public ArrayList<Person> getPreferences() {
+        ArrayList<Person> preferences = new ArrayList<>();
+        if (preference1 != null) {
+            preferences.add(preference1);
+        }
+        if (preference2 != null) {
+            preferences.add(preference2);
+        }
+        return preferences;
     }
 
     public String getName() {

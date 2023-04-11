@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 
 public class FileHandler {
     // location of csv: data/attendees.csv
@@ -11,6 +8,19 @@ public class FileHandler {
 
     public static boolean fileExists(String filename) {
         return new File(filename).isFile();
+    }
+
+    public static void saveCSV(String content, String filename) {
+        // take in a string in the format of a csv and save it to a file
+        // if the file exists, overwrite it
+        // if the file does not exist, create it
+        try (BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(filename))) {
+            // save the content to the file
+            writer.write(content.getBytes());
+            writer.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void getData() {

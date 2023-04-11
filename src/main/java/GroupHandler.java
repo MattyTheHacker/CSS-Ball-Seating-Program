@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Comparator;
 
 public class GroupHandler {
 
@@ -34,7 +33,7 @@ public class GroupHandler {
         GROUPS.sort((g1, g2) -> g2.getMembers().size() - g1.getMembers().size());
     }
 
-    public static void printGroups(){
+    public static void printGroups() {
         for (Group group : GROUPS) {
             System.out.print(group.getName() + "(" + group.getMembers().size() + ") - ");
             for (Person person : group.getMembers()) {
@@ -89,6 +88,12 @@ public class GroupHandler {
                 addGroup(group);
                 RecursivelyGenerateGroups(person, group);
             }
+        }
+    }
+
+    public static void generateAllRelationships() {
+        for (Group group : GROUPS) {
+            group.generateRelationships();
         }
     }
 }
