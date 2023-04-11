@@ -2,9 +2,8 @@ import java.util.*;
 
 public class Group {
     private final ArrayList<Person> MEMBERS = new ArrayList<>();
-    private int[][] RELATIONSHIPS;
-
     private final String name;
+    private int[][] RELATIONSHIPS;
 
     public Group(String name) {
         this.name = name;
@@ -43,9 +42,11 @@ public class Group {
             sb.append("\n");
         }
 
+        String filename = getName() + ".csv";
+
         // convert tabs to commas and save to csv
         String csv = sb.toString().replace("\t", ",");
-        FileHandler.saveCSV(csv, "data/relationships.csv");
+        FileHandler.saveCSV(csv, filename);
 
     }
 
@@ -76,9 +77,39 @@ public class Group {
                         RELATIONSHIPS[MEMBERS.indexOf(person)][MEMBERS.indexOf(preference)]++;
                     }
 
-                    // if two people have put each other as preferences, set to 7
+                    // if two people have put each other as preferences, set to 77
                     if (preference.getPreferences().contains(person)) {
-                        RELATIONSHIPS[MEMBERS.indexOf(person)][MEMBERS.indexOf(preference)] = 7;
+                        RELATIONSHIPS[MEMBERS.indexOf(person)][MEMBERS.indexOf(preference)] = 77;
+                    }
+                }
+            }
+        }
+
+        // recurse through the relationships to find indirect connections
+        // put every person within 3 steps of the target person into a cluster arraylist
+        // increment the relationship between the target and every person in the cluster by 1
+        for (Person target : MEMBERS) {
+            ArrayList<Person> cluster = new ArrayList<>(target.getPreferences());
+            ArrayList<Person> tmp = new ArrayList<>();
+            for (Person person : cluster) {
+                tmp.addAll(person.getPreferences());
+            }
+            for (Person person : cluster) {
+                tmp.addAll(person.getPreferences());
+            }
+
+            // add everyone from tmp into cluster
+            cluster.addAll(tmp);
+
+            // empty and delete tmp
+            tmp.clear();
+
+            // increment the relationship between the target and every person in the cluster by 1
+            for (Person person : cluster) {
+                if (MEMBERS.contains(person)) {
+                    // do not increment relationships with self
+                    if (!person.equals(target)) {
+                        RELATIONSHIPS[MEMBERS.indexOf(target)][MEMBERS.indexOf(person)]++;
                     }
                 }
             }
@@ -120,5 +151,9 @@ public class Group {
 
     public void empty() {
         MEMBERS.clear();
+    }
+
+    public boolean isEmpty() {
+        return MEMBERS.isEmpty();
     }
 }

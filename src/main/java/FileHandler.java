@@ -10,11 +10,19 @@ public class FileHandler {
         return new File(filename).isFile();
     }
 
+    public static String sanitiseFilename(String filename) {
+        // remove any illegal characters from the filename
+        return filename.replaceAll("[^a-zA-Z0-9.-]", "_");
+    }
+
     public static void saveCSV(String content, String filename) {
         // take in a string in the format of a csv and save it to a file
         // if the file exists, overwrite it
         // if the file does not exist, create it
-        try (BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(filename))) {
+        String sanitisedFilename = sanitiseFilename(filename);
+        String filepath = "data/" + sanitisedFilename;
+
+        try (BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(filepath))) {
             // save the content to the file
             writer.write(content.getBytes());
             writer.flush();

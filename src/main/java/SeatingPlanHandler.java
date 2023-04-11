@@ -88,9 +88,8 @@ public class SeatingPlanHandler {
             g2.addMember(group.getMembers().get(i));
         }
 
-        // empty the old group and remove it from GROUPS
+        // empty the old group
         group.empty();
-        GroupHandler.removeGroup(group);
 
         // try to add the groups to the table
         findATable(g1);
@@ -136,7 +135,7 @@ public class SeatingPlanHandler {
 
         // print the relationships within the biggest group
         System.out.println("Relationships:");
-        GroupHandler.getGroups().get(0).printRelationships();
+        GroupHandler.printAllRelationships();
 
         // iterate over the groups, check if they fit on a table, if not, split
         // first loop over all tables to see if they have space for the group
@@ -153,6 +152,9 @@ public class SeatingPlanHandler {
 
         // empty the split groups list
         GroupHandler.emptySplitGroups();
+
+        // remove empty groups from the list
+        GroupHandler.removeEmptyGroups();
 
         // print the seating plan
         printSeatingPlan();

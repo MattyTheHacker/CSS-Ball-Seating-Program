@@ -36,6 +36,10 @@ public class GroupHandler {
         SPLIT_GROUPS.clear();
     }
 
+    public static void removeEmptyGroups() {
+        GROUPS.removeIf(Group::isEmpty);
+    }
+
     public static void sortAllGroupsAlphabetically() {
         for (Group group : GROUPS) {
             group.sortMembersAlphabetically();
@@ -111,6 +115,12 @@ public class GroupHandler {
     public static void generateAllRelationships() {
         for (Group group : GROUPS) {
             group.generateRelationships();
+        }
+    }
+
+    public static void printAllRelationships() {
+        for (Group group : GROUPS) {
+            group.printRelationships();
         }
     }
 }
