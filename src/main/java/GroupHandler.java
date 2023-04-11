@@ -20,6 +20,12 @@ public class GroupHandler {
         }
     }
 
+    public static void sortAllGroupsAlphabetically() {
+        for (Group group : GROUPS) {
+            group.sortMembersAlphabetically();
+        }
+    }
+
     public static ArrayList<Group> getGroups() {
         return GROUPS;
     }
@@ -50,18 +56,13 @@ public class GroupHandler {
             if (otherGroup.contains(person)) {
                 // the person is already in a group, so we need to merge the groups
                 otherGroup.getMembers().forEach(targetGroup::addMember);
+                targetGroup.getMembers().forEach(otherGroup::addMember);
                 removeGroup(otherGroup);
                 break;
             }
         }
 
-        // if we've already merged two groups, we don't need to add the member again
-        if (!inGroup) {
-            // add the person to the group
-            targetGroup.addMember(person);
-        }
-
-        targetGroup.removeDuplicates();
+        targetGroup.addMember(person);
 
         // if the person has a preference, add them to this group too
         if (person.getPreference1() != null) {

@@ -1,4 +1,7 @@
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Group {
     private final ArrayList<Person> MEMBERS = new ArrayList<>();
@@ -18,7 +21,14 @@ public class Group {
     }
 
     public void removeDuplicates() {
-        MEMBERS.removeIf(person -> MEMBERS.indexOf(person) != MEMBERS.lastIndexOf(person));
+        // remove duplicate people, using a set
+        Set<Person> set = new HashSet<>(MEMBERS);
+        MEMBERS.clear();
+        MEMBERS.addAll(set);
+    }
+
+    public void sortMembersAlphabetically() {
+        MEMBERS.sort(Comparator.comparing(Person::getName));
     }
 
     public ArrayList<Person> getMembers() {
