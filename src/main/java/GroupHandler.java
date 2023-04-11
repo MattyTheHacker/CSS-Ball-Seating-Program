@@ -3,6 +3,7 @@ import java.util.ArrayList;
 public class GroupHandler {
 
     private static final ArrayList<Group> GROUPS = new ArrayList<>();
+    private static final ArrayList<Group> SPLIT_GROUPS = new ArrayList<>();
 
     public static void addGroup(Group group) {
         GROUPS.add(group);
@@ -17,6 +18,22 @@ public class GroupHandler {
         for (Group group : GROUPS) {
             group.removeDuplicates();
         }
+    }
+
+    public static void addSplitGroup(Group group) {
+        SPLIT_GROUPS.add(group);
+    }
+
+    public static void removeSplitGroup(Group group) {
+        SPLIT_GROUPS.remove(group);
+    }
+
+    public static ArrayList<Group> getSplitGroups() {
+        return SPLIT_GROUPS;
+    }
+
+    public static void emptySplitGroups() {
+        SPLIT_GROUPS.clear();
     }
 
     public static void sortAllGroupsAlphabetically() {

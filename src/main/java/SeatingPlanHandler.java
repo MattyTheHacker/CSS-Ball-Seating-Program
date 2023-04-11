@@ -74,6 +74,10 @@ public class SeatingPlanHandler {
         Group g1 = new Group(group.getName() + " 1");
         Group g2 = new Group(group.getName() + " 2");
 
+        // add the groups to the split groups list
+        GroupHandler.addSplitGroup(g1);
+        GroupHandler.addSplitGroup(g2);
+
         // add the first half of the group to g1
         for (int i = 0; i < group.getMembers().size() / 2; i++) {
             g1.addMember(group.getMembers().get(i));
@@ -83,6 +87,10 @@ public class SeatingPlanHandler {
         for (int i = group.getMembers().size() / 2; i < group.getMembers().size(); i++) {
             g2.addMember(group.getMembers().get(i));
         }
+
+        // empty the old group and remove it from GROUPS
+        group.empty();
+        GroupHandler.removeGroup(group);
 
         // try to add the groups to the table
         findATable(g1);
@@ -123,8 +131,8 @@ public class SeatingPlanHandler {
         GroupHandler.generateAllRelationships();
 
         // print groups
-//        System.out.println("Groups:");
-//        GroupHandler.printGroups();
+        System.out.println("Groups:");
+        GroupHandler.printGroups();
 
         // print the relationships within the biggest group
         System.out.println("Relationships:");
@@ -138,7 +146,15 @@ public class SeatingPlanHandler {
             findATable(g);
         }
 
+        for (Group g : GroupHandler.getSplitGroups()) {
+            // add split groups to the primary groups list
+            GroupHandler.addGroup(g);
+        }
+
+        // empty the split groups list
+        GroupHandler.emptySplitGroups();
+
         // print the seating plan
-//        printSeatingPlan();
+        printSeatingPlan();
     }
 }

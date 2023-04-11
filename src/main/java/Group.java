@@ -117,4 +117,8 @@ public class Group {
     public int getNumberOfMembers() {
         return MEMBERS.size();
     }
+
+    public void empty() {
+        MEMBERS.clear();
+    }
 }
