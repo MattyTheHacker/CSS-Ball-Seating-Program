@@ -75,6 +75,13 @@ public class SeatingPlanHandler {
             }
         }
 
+        if (group.getMembers().size() == 1) {
+            System.out.println("[DEBUG] Group " + group.getName() + " has " + group.getMembers().size() + " members");
+            System.out.println("[DEBUG] Members: " + group.getMembers());
+            System.out.println("[DEBUG] Things have gone very wrong! Exiting...");
+            System.exit(1);
+        }
+
         // split the group
         Group g1 = new Group(group.getName() + " 1");
         Group g2 = new Group(group.getName() + " 2");
@@ -112,35 +119,45 @@ public class SeatingPlanHandler {
                         Person p1 = group.getMembers().get(i);
                         Person p2 = group.getMembers().get(j);
 
-                        if (GroupHandler.checkGroupSplit(p1, p2)) {
-                            g1.addMember(p1);
-                            g2.addMember(p2);
+                        if (group.getRelationshipBetweenTwoPeople(p1, p2) > 0) {
+                            if (GroupHandler.checkGroupSplit(p1, p2)) {
+                                g1.addMember(p1);
+                                g2.addMember(p2);
 
-                            ArrayList<Person> p1Preferences = GroupHandler.recursivelyGetAllPreferencesExcept(p1, new ArrayList<>(), p2);
-                            ArrayList<Person> p2Preferences = GroupHandler.recursivelyGetAllPreferencesExcept(p2, new ArrayList<>(), p1);
+                                ArrayList<Person> tmp1 = new ArrayList<>();
+                                tmp1.add(p1);
 
-                            Set<Person> p1Set = new HashSet<>(p1Preferences);
-                            Set<Person> p2Set = new HashSet<>(p2Preferences);
+                                ArrayList<Person> tmp2 = new ArrayList<>();
+                                tmp2.add(p2);
 
-                            for (Person p : p1Set) {
-                                if (!g1.getMembers().contains(p)) {
-                                    g1.addMember(p);
+                                ArrayList<Person> p1Preferences = GroupHandler.recursivelyGetAllPreferencesExcept(p1, tmp1, p2);
+                                ArrayList<Person> p2Preferences = GroupHandler.recursivelyGetAllPreferencesExcept(p2, tmp2, p1);
+
+                                Set<Person> p1Set = new HashSet<>(p1Preferences);
+                                Set<Person> p2Set = new HashSet<>(p2Preferences);
+
+                                for (Person p : p1Set) {
+                                    if (!g1.getMembers().contains(p)) {
+                                        g1.addMember(p);
+                                    }
                                 }
-                            }
 
-                            for (Person p : p2Set) {
-                                if (!g2.getMembers().contains(p)) {
-                                    g2.addMember(p);
+                                for (Person p : p2Set) {
+                                    if (!g2.getMembers().contains(p)) {
+                                        g2.addMember(p);
+                                    }
                                 }
+
+                                group.empty();
+
+                                splitSuccess = true;
+
+                                System.out.println("[DEBUG] Split Group " + group.getName() + " on " + p1.getName() + " and " + p2.getName() + "!");
+
+                                break;
+                            } else {
+                                System.out.println("[DEBUG] Attempted to split Group " + group.getName() + " on " + p1.getName() + " and " + p2.getName() + " but failed!");
                             }
-
-                            group.empty();
-
-                            splitSuccess = true;
-
-                            break;
-                        } else {
-                            System.out.println("[DEBUG] Attempted to split Group " + group.getName() + " on " + p1.getName() + " and " + p2.getName() + " but failed!");
                         }
                     }
                 }

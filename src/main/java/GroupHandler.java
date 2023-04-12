@@ -137,12 +137,31 @@ public class GroupHandler {
         return preferences;
     }
 
+    public static ArrayList<Person> getPeopleWhoSelectedThisPerson(Person person) {
+        ArrayList<Person> people = new ArrayList<>();
+        for (Person p : SeatingPlanHandler.getPeople()) {
+            if (p.getPreference1() == person || p.getPreference2() == person) {
+                people.add(p);
+            }
+        }
+        return people;
+    }
+
     public static boolean checkGroupSplit(Person p1, Person p2) {
         // if we break the relationship between these two people, do we get two distinct groups?
         // if yes return true, else false
         // recursively add p1's relationships to g1
-        ArrayList<Person> p1Preferences = recursivelyGetAllPreferences(p1, new ArrayList<>());
-        ArrayList<Person> p2Preferences = recursivelyGetAllPreferences(p2, new ArrayList<>());
+        ArrayList<Person> p1p = getPeopleWhoSelectedThisPerson(p1);
+        ArrayList<Person> p2p = getPeopleWhoSelectedThisPerson(p2);
+
+        // remove p2 from p1's preferences
+        p1p.remove(p2);
+
+        // remove p1 from p2's preferences
+        p2p.remove(p1);
+
+        ArrayList<Person> p1Preferences = recursivelyGetAllPreferences(p1, p1p);
+        ArrayList<Person> p2Preferences = recursivelyGetAllPreferences(p2, p2p);
 
         // check for any overlap between the two arraylists
         for (Person p : p1Preferences) {

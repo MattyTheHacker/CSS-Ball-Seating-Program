@@ -131,7 +131,25 @@ public class Group {
                     }
                 }
             }
+            // if the target has not been selected as a preference by anyone, set their relationship with everyone to 1
+            if (GroupHandler.getPeopleWhoSelectedThisPerson(target).size() == 0) {
+                for (Person person : MEMBERS) {
+                    if (!person.equals(target)) {
+                        RELATIONSHIPS[MEMBERS.indexOf(target)][MEMBERS.indexOf(person)] = 1;
+                        RELATIONSHIPS[MEMBERS.indexOf(person)][MEMBERS.indexOf(target)] = 1;
+                    }
+                }
+            }
         }
+    }
+    public boolean isDirectConnection(Person p1, Person p2) {
+        // if the two people are directly connected, return true
+        return p1.getPreferences().contains(p2) || p2.getPreferences().contains(p1);
+    }
+
+    public boolean isStrongConnection(Person p1, Person p2) {
+        // if the two people are strongly connected, return true
+        return p1.getPreferences().contains(p2) && p2.getPreferences().contains(p1);
     }
 
     public int getRelationshipBetweenTwoPeople(Person person1, Person person2) {
