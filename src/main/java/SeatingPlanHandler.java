@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -90,83 +91,76 @@ public class SeatingPlanHandler {
         GroupHandler.addSplitGroup(g1);
         GroupHandler.addSplitGroup(g2);
 
-        int[][] relationships = group.getRelationships();
-        int weakestRelationship = 100;
         boolean splitSuccess = false;
 
-        // iterate over the relationships
-        // find the weakest relationship
-        // if one person has two relationships that are lowest, then split the group on that person
-        // allocate that person to the smallest group first
-        for (int i = 0; i < relationships.length; i++) {
-            for (int j = 0; j < relationships[i].length; j++) {
-                if (relationships[i][j] > 0 && relationships[j][i] > 0) {
-                    int weight = relationships[i][j] + relationships[j][i];
-                    if (weight < weakestRelationship && weight > 0) {
-                        weakestRelationship = weight;
-                    }
-                }
-            }
-        }
+        // loop over everyone in the group and add both people to the list with their relationship strength
+        // check if it's a strong connection, if so - do not add them to the list
+        // also add the strength of the relationship to the list
+        ArrayList<Relationship> relationshipList = new ArrayList<>();
 
-        weakestRelationship = weakestRelationship * 2;
-
-        for (int i = 0; i < relationships.length; i++) {
-            for (int j = 0; j < relationships[i].length; j++) {
-                if (relationships[i][j] >= 0 && relationships[j][i] >= 0 && !splitSuccess) {
-                    int weight = relationships[i][j] + relationships[j][i];
-                    if (weight <= weakestRelationship) {
-                        Person p1 = group.getMembers().get(i);
-                        Person p2 = group.getMembers().get(j);
-
-                        if (group.getRelationshipBetweenTwoPeople(p1, p2) > 0) {
-                            if (GroupHandler.checkGroupSplit(p1, p2)) {
-                                g1.addMember(p1);
-                                g2.addMember(p2);
-
-                                ArrayList<Person> tmp1 = new ArrayList<>();
-                                tmp1.add(p1);
-
-                                ArrayList<Person> tmp2 = new ArrayList<>();
-                                tmp2.add(p2);
-
-                                ArrayList<Person> p1Preferences = GroupHandler.recursivelyGetAllPreferencesExcept(p1, tmp1, p2);
-                                ArrayList<Person> p2Preferences = GroupHandler.recursivelyGetAllPreferencesExcept(p2, tmp2, p1);
-
-                                Set<Person> p1Set = new HashSet<>(p1Preferences);
-                                Set<Person> p2Set = new HashSet<>(p2Preferences);
-
-                                for (Person p : p1Set) {
-                                    if (!g1.getMembers().contains(p)) {
-                                        g1.addMember(p);
-                                    }
-                                }
-
-                                for (Person p : p2Set) {
-                                    if (!g2.getMembers().contains(p)) {
-                                        g2.addMember(p);
-                                    }
-                                }
-
-                                group.empty();
-
-                                splitSuccess = true;
-
-                                System.out.println("[DEBUG] Split Group " + group.getName() + " on " + p1.getName() + " and " + p2.getName() + "!");
-
-                                break;
-                            } else {
-                                System.out.println("[DEBUG] Attempted to split Group " + group.getName() + " on " + p1.getName() + " and " + p2.getName() + " but failed!");
-                            }
+        for (Person p1 : group.getMembers()) {
+            for (Person p2 : group.getMembers()) {
+                if (!p1.equals(p2)) {
+                    if (group.isDirectConnection(p1, p2)) {
+                        if (!group.isStrongConnection(p1, p2)) {
+                            int relationship = group.getRelationshipBetweenTwoPeople(p1, p2) + group.getRelationshipBetweenTwoPeople(p2, p1);
+                            relationshipList.add(new Relationship(p1, p2, relationship, false));
                         }
                     }
                 }
             }
         }
 
+        // sort the list by relationship strength with weakest first
+        relationshipList.sort(Comparator.comparingInt(Relationship::getStrength));
+
+        for (Relationship r : relationshipList) {
+            if (GroupHandler.checkGroupSplit(r.getPerson1(), r.getPerson2())) {
+                g1.addMember(r.getPerson1());
+                g2.addMember(r.getPerson2());
+
+                ArrayList<Person> tmp1 = new ArrayList<>();
+                tmp1.add(r.getPerson1());
+
+                ArrayList<Person> tmp2 = new ArrayList<>();
+                tmp2.add(r.getPerson2());
+
+                ArrayList<Person> p1Preferences = GroupHandler.recursivelyGetAllPreferencesExcept(r.getPerson1(), tmp1, r.getPerson2());
+                ArrayList<Person> p2Preferences = GroupHandler.recursivelyGetAllPreferencesExcept(r.getPerson2(), tmp2, r.getPerson1());
+
+                Set<Person> p1Set = new HashSet<>(p1Preferences);
+                Set<Person> p2Set = new HashSet<>(p2Preferences);
+
+                for (Person p : p1Set) {
+                    if (!g1.getMembers().contains(p)) {
+                        g1.addMember(p);
+                    }
+                }
+
+                for (Person p : p2Set) {
+                    if (!g2.getMembers().contains(p)) {
+                        g2.addMember(p);
+                    }
+                }
+
+                group.empty();
+
+                splitSuccess = true;
+
+                System.out.println("[DEBUG] Split Group " + group.getName() + " on " + r.getPerson1().getName() + " and " + r.getPerson2().getName() + "!");
+
+                break;
+            } else {
+                System.out.println("[DEBUG] Failed to split group " + group.getName() + " on " + r.getPerson1().getName() + " and " + r.getPerson2().getName() + "!");
+            }
+        }
+
         if (!splitSuccess) {
             System.out.println("[ERROR] Could not split group " + group.getName() + "!");
-            System.out.println("Weakest relationship: " + weakestRelationship);
+            System.out.println("[DEBUG] Relationships: ");
+            for (Relationship r : relationshipList) {
+                System.out.println(r.getPerson1().getName() + " - " + r.getPerson2().getName() + " : " + r.getStrength());
+            }
             System.exit(1);
         }
 

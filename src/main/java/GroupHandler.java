@@ -160,8 +160,8 @@ public class GroupHandler {
         // remove p1 from p2's preferences
         p2p.remove(p1);
 
-        ArrayList<Person> p1Preferences = recursivelyGetAllPreferences(p1, p1p);
-        ArrayList<Person> p2Preferences = recursivelyGetAllPreferences(p2, p2p);
+        ArrayList<Person> p1Preferences = recursivelyGetAllPreferencesExcept(p1, p1p, p2);
+        ArrayList<Person> p2Preferences = recursivelyGetAllPreferencesExcept(p2, p2p, p1);
 
         // check for any overlap between the two arraylists
         for (Person p : p1Preferences) {
