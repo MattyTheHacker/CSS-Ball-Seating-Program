@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class GroupHandler {
 
@@ -138,8 +139,9 @@ public class GroupHandler {
     }
 
     public static ArrayList<Person> getPeopleWhoSelectedThisPerson(Person person) {
+        Group g = person.getGroup();
         ArrayList<Person> people = new ArrayList<>();
-        for (Person p : SeatingPlanHandler.getPeople()) {
+        for (Person p : g.getMembers()) {
             if (p.getPreference1() == person || p.getPreference2() == person) {
                 people.add(p);
             }
@@ -190,5 +192,85 @@ public class GroupHandler {
             recursivelyGetAllPreferencesExcept(person.getPreference2(), preferences, except);
         }
         return preferences;
+    }
+
+    public static ArrayList<Person> getClusterExcept(Person person, Person except) {
+        ArrayList<Person> cluster = person.getPreferences();
+        cluster.add(person);
+        cluster.remove(except);
+
+        cluster.addAll(recursivelyGetClusterExcept(person, cluster, except));
+
+        // remove dupes
+        cluster = new ArrayList<>(new HashSet<>(cluster));
+
+        return cluster;
+    }
+
+    public static ArrayList<Person> recursivelyGetClusterExcept(Person person, ArrayList<Person> cluster, Person except) {
+        // don't worry about duplicates, we'll handle that later
+
+        if (person.getGroup().getMembers().size() * 2 < cluster.size()) {
+            if (person.getPreference1() != null && person.getPreference1() != except) {
+                cluster.add(person.getPreference1());
+                recursivelyGetClusterExcept(person.getPreference1(), cluster, except);
+            }
+            if (person.getPreference2() != null && person.getPreference2() != except) {
+                cluster.add(person.getPreference2());
+                recursivelyGetClusterExcept(person.getPreference2(), cluster, except);
+            }
+        }
+
+        return cluster;
+    }
+
+    public static ArrayList<Person> getAllNearbyPeopleExcept(Person person, Person except) {
+        ArrayList<Person> nearbyPeople = new ArrayList<>();
+
+        for (Person p : person.getPreferences()) {
+            if (p != except) {
+                nearbyPeople.add(p);
+            }
+        }
+
+        ArrayList<Person> tmp = new ArrayList<>();
+
+        for (Person p : nearbyPeople) {
+            for (Person p2 : p.getPreferences()) {
+                if (p2 != except && !nearbyPeople.contains(p2)) {
+                    tmp.add(p2);
+                    tmp.addAll(getPeopleWhoSelectedThisPerson(p2));
+                }
+            }
+        }
+
+
+
+        nearbyPeople.addAll(tmp);
+
+        for (Person p : nearbyPeople) {
+            for (Person p2 : p.getPreferences()) {
+                if (p2 != except && !nearbyPeople.contains(p2)) {
+                    tmp.add(p2);
+                    tmp.addAll(getPeopleWhoSelectedThisPerson(p2));
+                }
+            }
+        }
+
+        nearbyPeople.addAll(tmp);
+
+        for (Person p : nearbyPeople) {
+            for (Person p2 : p.getPreferences()) {
+                if (p2 != except && !nearbyPeople.contains(p2)) {
+                    tmp.add(p2);
+                    tmp.addAll(getPeopleWhoSelectedThisPerson(p2));
+                }
+            }
+        }
+
+        nearbyPeople.addAll(tmp);
+
+        return nearbyPeople;
+
     }
 }

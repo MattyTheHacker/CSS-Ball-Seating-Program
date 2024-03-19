@@ -102,10 +102,8 @@ public class SeatingPlanHandler {
             for (Person p2 : group.getMembers()) {
                 if (!p1.equals(p2)) {
                     if (group.isDirectConnection(p1, p2)) {
-                        if (!group.isStrongConnection(p1, p2)) {
-                            int relationship = group.getRelationshipBetweenTwoPeople(p1, p2) + group.getRelationshipBetweenTwoPeople(p2, p1);
-                            relationshipList.add(new Relationship(p1, p2, relationship, false));
-                        }
+                        int relationship = group.getRelationshipBetweenTwoPeople(p1, p2) + group.getRelationshipBetweenTwoPeople(p2, p1);
+                        relationshipList.add(new Relationship(p1, p2, relationship, group.isStrongConnection(p1, p2)));
                     }
                 }
             }
@@ -115,43 +113,53 @@ public class SeatingPlanHandler {
         relationshipList.sort(Comparator.comparingInt(Relationship::getStrength));
 
         for (Relationship r : relationshipList) {
-            if (GroupHandler.checkGroupSplit(r.getPerson1(), r.getPerson2())) {
-                g1.addMember(r.getPerson1());
-                g2.addMember(r.getPerson2());
+            if (!r.isStrong()) {
+                if (GroupHandler.checkGroupSplit(r.getPerson1(), r.getPerson2())) {
+                    g1.addMember(r.getPerson1());
+                    g2.addMember(r.getPerson2());
 
-                ArrayList<Person> tmp1 = new ArrayList<>();
-                tmp1.add(r.getPerson1());
+                    ArrayList<Person> tmp1 = new ArrayList<>();
+                    tmp1.add(r.getPerson1());
+                    tmp1.addAll(GroupHandler.getPeopleWhoSelectedThisPerson(r.getPerson1()));
+                    tmp1.addAll(GroupHandler.getClusterExcept(r.getPerson1(), r.getPerson2()));
+                    tmp1.addAll(GroupHandler.getAllNearbyPeopleExcept(r.getPerson1(), r.getPerson2()));
+                    tmp1.remove(r.getPerson2());
 
-                ArrayList<Person> tmp2 = new ArrayList<>();
-                tmp2.add(r.getPerson2());
+                    ArrayList<Person> tmp2 = new ArrayList<>();
+                    tmp2.add(r.getPerson2());
+                    tmp2.addAll(GroupHandler.getPeopleWhoSelectedThisPerson(r.getPerson2()));
+                    tmp2.addAll(GroupHandler.getClusterExcept(r.getPerson2(), r.getPerson1()));
+                    tmp2.addAll(GroupHandler.getAllNearbyPeopleExcept(r.getPerson2(), r.getPerson1()));
+                    tmp2.remove(r.getPerson1());
 
-                ArrayList<Person> p1Preferences = GroupHandler.recursivelyGetAllPreferencesExcept(r.getPerson1(), tmp1, r.getPerson2());
-                ArrayList<Person> p2Preferences = GroupHandler.recursivelyGetAllPreferencesExcept(r.getPerson2(), tmp2, r.getPerson1());
+                    ArrayList<Person> p1Preferences = GroupHandler.recursivelyGetAllPreferencesExcept(r.getPerson1(), tmp1, r.getPerson2());
+                    ArrayList<Person> p2Preferences = GroupHandler.recursivelyGetAllPreferencesExcept(r.getPerson2(), tmp2, r.getPerson1());
 
-                Set<Person> p1Set = new HashSet<>(p1Preferences);
-                Set<Person> p2Set = new HashSet<>(p2Preferences);
+                    Set<Person> p1Set = new HashSet<>(p1Preferences);
+                    Set<Person> p2Set = new HashSet<>(p2Preferences);
 
-                for (Person p : p1Set) {
-                    if (!g1.getMembers().contains(p)) {
-                        g1.addMember(p);
+                    for (Person p : p1Set) {
+                        if (!g1.getMembers().contains(p)) {
+                            g1.addMember(p);
+                        }
                     }
-                }
 
-                for (Person p : p2Set) {
-                    if (!g2.getMembers().contains(p)) {
-                        g2.addMember(p);
+                    for (Person p : p2Set) {
+                        if (!g2.getMembers().contains(p)) {
+                            g2.addMember(p);
+                        }
                     }
+
+                    group.empty();
+
+                    splitSuccess = true;
+
+                    System.out.println("[DEBUG] Split Group " + group.getName() + " on " + r.getPerson1().getName() + " and " + r.getPerson2().getName() + "!");
+
+                    break;
+                } else {
+                    System.out.println("[DEBUG] Failed to split group " + group.getName() + " on " + r.getPerson1().getName() + " and " + r.getPerson2().getName() + "!");
                 }
-
-                group.empty();
-
-                splitSuccess = true;
-
-                System.out.println("[DEBUG] Split Group " + group.getName() + " on " + r.getPerson1().getName() + " and " + r.getPerson2().getName() + "!");
-
-                break;
-            } else {
-                System.out.println("[DEBUG] Failed to split group " + group.getName() + " on " + r.getPerson1().getName() + " and " + r.getPerson2().getName() + "!");
             }
         }
 
@@ -234,5 +242,12 @@ public class SeatingPlanHandler {
 
         // print the seating plan
         printSeatingPlan();
+
+        // has anyone not been seated?
+        for (Person p : PEOPLE) {
+            if (p.getSeat() == null) {
+                System.out.println("[DEBUG] " + p.getName() + " in group " + p.getGroup() + " has not been seated!");
+            }
+        }
     }
 }

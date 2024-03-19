@@ -89,5 +89,13 @@ public class Person {
         this.active = active;
     }
 
+    public Group getGroup() {
+        for (Group group : GroupHandler.getGroups()) {
+            if (group.contains(this)) {
+                return group;
+            }
+        }
+        return null;
+    }
 
 }
