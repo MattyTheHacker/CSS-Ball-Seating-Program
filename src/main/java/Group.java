@@ -77,7 +77,7 @@ public class Group {
         // for each person in the group, if they have selected someone as a preference, increment relationship by 10
         for (Person person : MEMBERS) {
             ArrayList<Person> preferences = person.getPreferences();
-            if (preferences.size() > 0) {
+            if (!preferences.isEmpty()) {
                 for (Person preference : preferences) {
                     if (MEMBERS.contains(preference)) {
                         // increment the relationship
@@ -132,7 +132,7 @@ public class Group {
                 }
             }
             // if the target has not been selected as a preference by anyone, set their relationship with everyone to 1
-            if (GroupHandler.getPeopleWhoSelectedThisPerson(target).size() == 0) {
+            if (GroupHandler.getPeopleWhoSelectedThisPerson(target).isEmpty()) {
                 for (Person person : MEMBERS) {
                     if (!person.equals(target)) {
                         RELATIONSHIPS[MEMBERS.indexOf(target)][MEMBERS.indexOf(person)] = 1;
@@ -157,6 +157,9 @@ public class Group {
         if (!MEMBERS.contains(person1) || !MEMBERS.contains(person2)) {
             return -1;
         } else {
+            if (RELATIONSHIPS == null) {
+                generateRelationships();
+            }
             return RELATIONSHIPS[MEMBERS.indexOf(person1)][MEMBERS.indexOf(person2)];
         }
     }

@@ -11,6 +11,10 @@ public class Person {
     private boolean active;
 
     public Person(String name) {
+        if (name == null || name.isEmpty()) {
+            System.out.println("Name is null or empty: " + name);
+            throw new IllegalArgumentException("Name cannot be null");
+        }
         this.name = name;
         this.preference1 = null;
         this.preference2 = null;

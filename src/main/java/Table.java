@@ -85,6 +85,7 @@ public class Table {
         for (Person person : group.getMembers()) {
             // if the person is already at a table, throw an exception
             if (person.getSeat() != null) {
+                System.out.println("[ERROR] Person: " + person.getName() + " is sat at: " + person.getSeat());
                 throw new IllegalArgumentException("[ERROR] Person " + person.getName() + " is already at a table!");
             }
             // if the table is full, throw an exception

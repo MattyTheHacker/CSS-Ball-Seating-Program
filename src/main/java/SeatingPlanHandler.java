@@ -7,7 +7,6 @@ public class SeatingPlanHandler {
     private static final ArrayList<Table> TABLES = new ArrayList<>();
     private static final ArrayList<Person> PEOPLE = new ArrayList<>();
 
-
     private static final int MAX_TABLES = 20;
     private static final int MAX_PEOPLE = 200;
 
@@ -38,7 +37,7 @@ public class SeatingPlanHandler {
                 return person;
             }
         }
-        throw new IllegalArgumentException("[ERORR] Person " + name + " does not exist!");
+        throw new IllegalArgumentException("[ERROR] Person " + name + " does not exist!");
     }
 
     public static boolean personExists(String name) {
@@ -149,6 +148,9 @@ public class SeatingPlanHandler {
                             g2.addMember(p);
                         }
                     }
+
+                    g1.removeMember(r.getPerson1());
+                    g2.removeMember(r.getPerson2());
 
                     group.empty();
 
