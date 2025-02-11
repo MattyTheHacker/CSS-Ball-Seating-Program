@@ -7,8 +7,8 @@ public class SeatingPlanHandler {
     private static final ArrayList<Table> TABLES = new ArrayList<>();
     private static final ArrayList<Person> PEOPLE = new ArrayList<>();
 
-    private static final int MAX_TABLES = 20;
-    private static final int MAX_PEOPLE = 200;
+    private static final int MAX_TABLES = 26;
+    private static final int MAX_PEOPLE = 260;
 
     public static void addTable(Table table) {
         TABLES.add(table);
@@ -74,114 +74,7 @@ public class SeatingPlanHandler {
                 }
             }
         }
-
-        if (group.getMembers().size() == 1) {
-            System.out.println("[DEBUG] Group " + group.getName() + " has " + group.getMembers().size() + " members");
-            System.out.println("[DEBUG] Members: " + group.getMembers());
-            System.out.println("[DEBUG] Things have gone very wrong! Exiting...");
-            System.exit(1);
-        }
-
-        // split the group
-        Group g1 = new Group(group.getName() + " 1");
-        Group g2 = new Group(group.getName() + " 2");
-
-        // add the groups to the split groups list
-        GroupHandler.addSplitGroup(g1);
-        GroupHandler.addSplitGroup(g2);
-
-        boolean splitSuccess = false;
-
-        // loop over everyone in the group and add both people to the list with their relationship strength
-        // check if it's a strong connection, if so - do not add them to the list
-        // also add the strength of the relationship to the list
-        ArrayList<Relationship> relationshipList = new ArrayList<>();
-
-        for (Person p1 : group.getMembers()) {
-            for (Person p2 : group.getMembers()) {
-                if (!p1.equals(p2)) {
-                    if (group.isDirectConnection(p1, p2)) {
-                        int relationship = group.getRelationshipBetweenTwoPeople(p1, p2) + group.getRelationshipBetweenTwoPeople(p2, p1);
-                        relationshipList.add(new Relationship(p1, p2, relationship, group.isStrongConnection(p1, p2)));
-                    }
-                }
-            }
-        }
-
-        // sort the list by relationship strength with weakest first
-        relationshipList.sort(Comparator.comparingInt(Relationship::getStrength));
-
-        for (Relationship r : relationshipList) {
-            if (!r.isStrong()) {
-                if (GroupHandler.checkGroupSplit(r.getPerson1(), r.getPerson2())) {
-                    g1.addMember(r.getPerson1());
-                    g2.addMember(r.getPerson2());
-
-                    ArrayList<Person> tmp1 = new ArrayList<>();
-                    tmp1.add(r.getPerson1());
-                    tmp1.addAll(GroupHandler.getPeopleWhoSelectedThisPerson(r.getPerson1()));
-                    tmp1.addAll(GroupHandler.getClusterExcept(r.getPerson1(), r.getPerson2()));
-                    tmp1.addAll(GroupHandler.getAllNearbyPeopleExcept(r.getPerson1(), r.getPerson2()));
-                    tmp1.remove(r.getPerson2());
-
-                    ArrayList<Person> tmp2 = new ArrayList<>();
-                    tmp2.add(r.getPerson2());
-                    tmp2.addAll(GroupHandler.getPeopleWhoSelectedThisPerson(r.getPerson2()));
-                    tmp2.addAll(GroupHandler.getClusterExcept(r.getPerson2(), r.getPerson1()));
-                    tmp2.addAll(GroupHandler.getAllNearbyPeopleExcept(r.getPerson2(), r.getPerson1()));
-                    tmp2.remove(r.getPerson1());
-
-                    ArrayList<Person> p1Preferences = GroupHandler.recursivelyGetAllPreferencesExcept(r.getPerson1(), tmp1, r.getPerson2());
-                    ArrayList<Person> p2Preferences = GroupHandler.recursivelyGetAllPreferencesExcept(r.getPerson2(), tmp2, r.getPerson1());
-
-                    Set<Person> p1Set = new HashSet<>(p1Preferences);
-                    Set<Person> p2Set = new HashSet<>(p2Preferences);
-
-                    for (Person p : p1Set) {
-                        if (!g1.getMembers().contains(p)) {
-                            g1.addMember(p);
-                        }
-                    }
-
-                    for (Person p : p2Set) {
-                        if (!g2.getMembers().contains(p)) {
-                            g2.addMember(p);
-                        }
-                    }
-
-                    g1.removeMember(r.getPerson1());
-                    g2.removeMember(r.getPerson2());
-
-                    group.empty();
-
-                    splitSuccess = true;
-
-                    System.out.println("[DEBUG] Split Group " + group.getName() + " on " + r.getPerson1().getName() + " and " + r.getPerson2().getName() + "!");
-
-                    break;
-                } else {
-                    System.out.println("[DEBUG] Failed to split group " + group.getName() + " on " + r.getPerson1().getName() + " and " + r.getPerson2().getName() + "!");
-                }
-            }
-        }
-
-        if (!splitSuccess) {
-            System.out.println("[ERROR] Could not split group " + group.getName() + "!");
-            System.out.println("[DEBUG] Relationships: ");
-            for (Relationship r : relationshipList) {
-                System.out.println(r.getPerson1().getName() + " - " + r.getPerson2().getName() + " : " + r.getStrength());
-            }
-            System.exit(1);
-        }
-
-
-        // empty the old group
-        group.empty();
-
-        // try to add the groups to the table
-        findATable(g1);
-        findATable(g2);
-
+        System.out.println("Group: " + group.getName() + " is too big for a table!");
     }
 
     public static void generateSeatingPlan() {
