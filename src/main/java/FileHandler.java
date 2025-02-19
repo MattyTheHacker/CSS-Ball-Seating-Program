@@ -84,6 +84,10 @@ public class FileHandler {
                         attendee.setPreference1(preference1);
                         SeatingPlanHandler.addPerson(preference1);
                     } else {
+                        if (data[1].equals("N/A")) {
+                            continue;
+                        }
+
                         // the person does not exist, create them
                         Person preference1 = new Person(data[1]);
                         attendee.setPreference1(preference1);
@@ -100,6 +104,10 @@ public class FileHandler {
                         SeatingPlanHandler.addPerson(preference2);
                     } else {
                         // the person does not exist, create them
+                        if (data[2].equals("N/A")) {
+                            continue;
+                        }
+
                         Person preference2 = new Person(data[2]);
                         attendee.setPreference2(preference2);
                         SeatingPlanHandler.addPerson(preference2);
